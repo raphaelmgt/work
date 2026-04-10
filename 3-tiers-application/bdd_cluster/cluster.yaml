@@ -1,0 +1,23 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres-cluster
+spec:
+  instances: 3  # Nombre de nœuds (1 maître + 2 réplicas)
+  
+  # Gestion du stockage (Persistance)
+  storage:
+    size: 10Gi
+    storageClass: standard # À adapter selon votre cloud (gp2, longhorn, etc.)
+
+  # Configuration de la base de données
+  bootstrap:
+    initdb:
+      database: app_db
+      owner: app_user
+      secret:
+        name: postgres-app-user-creds # Nom du secret contenant le mot de passe
+
+  # Monitoring (Optionnel)
+  monitoring:
+    enablePodMonitor: true

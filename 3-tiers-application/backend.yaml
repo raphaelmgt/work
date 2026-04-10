@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: hugosmn5/backend-3-tier:1.1
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "200m"  # Strictement égal au request
+            memory: "256Mi" # Strictement égal au request
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: secrets-backend
+              key: DB_USER_SECRET
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: secrets-backend
+              key: DB_PASS_SECRET
+        - name: DB
+          valueFrom:
+            secretKeyRef:
+              name: secrets-backend
+              key: DB_SECRET
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: secrets-backend
+              key: DB_HOST_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 5000
+    targetPort: 5000

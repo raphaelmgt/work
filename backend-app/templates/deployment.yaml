@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backend.service.name }}
+  labels:
+    {{- include "backend-app.labels" . | nindent 4 }}
+spec:
+  {{- if and .Values.backend.autoscaling (not .Values.backend.autoscaling.enabled) }}
+  replicas: {{ .Values.backend.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "backend-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "backend-app.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "backend-app.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          env:
+          - name: DB
+            value: {{ .Values.postgresql.cluster.initdb.database | quote }}
+          - name: DB_HOST
+            value: {{ printf "%s-postgresql-rw" .Release.Name | quote }}
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ printf "%s-postgresql-app" .Release.Name }}
+                key: username
+          - name: DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: {{ printf "%s-postgresql-app" .Release.Name }}
+                key: password
+          ports:
+            - name: http
+              containerPort: {{ .Values.backend.service.port }}
+              protocol: TCP
+          {{- with .Values.backend.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.backend.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.backend.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

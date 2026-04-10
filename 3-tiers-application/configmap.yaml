@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bdd-config
+data: 
+  POSTGRES_USER: "admin"
+  POSTGRES_PASSWORD: "password"
+  POSTGRES_DB: "reviews"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bdd-init
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS reviews (
+      name TEXT NOT NULL,
+      review TEXT NOT NULL
+    );
+    INSERT INTO reviews (name, review) VALUES 
+    ('Alice', 'Le cours était clair et bien structuré.'),
+    ('Bob', 'Les TP sont très compliqués je trouve.'),
+    ('Charlie', 'Nul (oui je suis aigri mdr)'),
+    ('Diane', 'Le contenu est dense, mais les exemples aident beaucoup à comprendre.');

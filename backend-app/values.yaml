@@ -1,0 +1,98 @@
+backend:
+
+  replicaCount: 2
+
+  image:
+    repository: hugosmn5/backend-3-tier
+    pullPolicy: IfNotPresent
+    tag: "1.1"
+
+  envSecretsName: secrets-backend
+
+  service:
+    name: backend
+    type: ClusterIP
+    port: 5000
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: ""
+
+  autoscaling:
+    enabled: false
+
+  ingress:
+    enabled: false
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+
+  httpRoute:
+    enabled: false
+
+  resources: {}
+
+  livenessProbe:
+    tcpSocket:       # On vérifie juste si le port répond
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+
+  readinessProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 15
+
+# Configuration du cluster PostgreSQL (dépendance CNPG)
+postgresql:
+  cluster:
+    instances: 1
+    storage:
+      size: "1Gi"
+    initdb:
+      database: reviews
+      owner: admin
+
+configmap:
+  name: bdd-init
+
+frontend:
+
+  replicaCount: 1
+
+  image:
+    repository: hugosmn5/frontend-3-tier
+    pullPolicy: IfNotPresent
+    tag: "1.1"
+
+  service:
+    name: frontend
+    type: ClusterIP
+    port: 5000
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: ""
+
+  autoscaling:
+    enabled: false
+  
+  env:
+    BACKEND_URL: "http://backend:5000"
+
+  ingress:
+    name: ingress
+    enabled: true
+    hosts:
+      - host: frontend-tp-ingress.lab.sspcloud.fr
+        paths:
+          - path: /
+    port: 5000
+
+  httpRoute:
+    enabled: true
+
+  resources: {}

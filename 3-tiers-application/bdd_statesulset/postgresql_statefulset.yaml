@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql-sfs
+spec:
+  serviceName: "postgresql-sfs"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql-sfs
+  template:
+    metadata:
+      labels:
+        app: postgresql-sfs
+    spec:
+      containers:
+        - name: postgresql-sfs
+          image: postgres:13
+          ports:
+            - containerPort: 5432
+              name: postgresql-sfs
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          envFrom:
+            - configMapRef:
+                name: bdd-config
+          volumeMounts:
+            - name: sql-script-volume
+              mountPath: /docker-entrypoint-initdb.d/
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: sql-script-volume
+          configMap:
+            name: bdd-init
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-sfs
+  labels:
+    app: postgresql-sfs
+spec:
+  ports:
+    - port: 5432
+      name: postgresql-sfs
+  clusterIP: None
+  selector:
+    app: postgresql-sfs

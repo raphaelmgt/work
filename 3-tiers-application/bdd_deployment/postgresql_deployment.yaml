@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql-dpmt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql-dpmt
+  template:
+    metadata:
+      labels:
+        app: postgresql-dpmt
+    spec:
+      containers:
+      - name: postgresql-dpmt
+        image: postgres:13
+        ports:
+        - containerPort: 5432
+        envFrom:
+          - configMapRef:
+              name: bdd-config
+        volumeMounts:
+        - name: sql-script-volume
+          mountPath: /docker-entrypoint-initdb.d/
+      volumes:
+      - name: sql-script-volume
+        configMap:
+          name: bdd-init
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-dpmt
+spec:
+  selector:
+    app: postgresql-dpmt
+  ports:
+  - port: 5432
+    targetPort: 5432
