@@ -18,9 +18,13 @@ Ou si on ne souhaite pas utiliser de fichier yaml pour créer les secrets :
 kubectl create secret generic secrets-backend --from-env-file=secrets.env
 ```
 
-- La seconde approche quant à elle repose uniquement sur un fichier secrets.yaml
+- La seconde approche quant à elle repose uniquement sur un fichier `secrets.yaml` qui crée les objets secrets à la la manière d'un deployment ou d'un statefulset avec la commande : 
 
+```bash
+kubectl apply -f ./path/secrets.yaml
+```
 
+Dans le second point, j'expose les données sensibles directement dans un fichier YAML (ce qui n'est pas une bonne pratique malheureurement). Malgré cela, j'utilise cette méthode pour créer les secrets car je n'arrive pas à connecter le secret à mon backend (le back et la bdd ne peuvent pas communiquer). 
 
 Une fois les secrets définis (quelque soit la démarque), j'ai ensuite modifié le fichier `backend.yaml` en remplaçant chaque 
 
@@ -64,3 +68,5 @@ resources:
 ```
 
 **Remarque :** Si on ne précise que les limtes dans le fichier YAML, Kubernetes définit par défaut les requests à la même valeur. Le Pod aura une QoS Guaranteed dans ce cas.
+
+## Mise en place de clustering sur les bases de données postgresql
