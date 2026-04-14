@@ -6,7 +6,9 @@ metadata:
     {{- include "backend-app.labels" . | nindent 4 }}
     app.kubernetes.io/component: frontend
 spec:
+  {{- if not .Values.frontend.autoscaling.enabled }}
   replicas: {{ .Values.frontend.replicaCount | default 1 }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "backend-app.selectorLabels" . | nindent 6 }}
@@ -29,16 +31,15 @@ spec:
           env:
             - name: BACKEND_URL
               value: {{ .Values.frontend.env.BACKEND_URL | quote }}
-          {{- with .Values.frontend.resources }}
+          {{- if .Values.frontend.resources }}
           resources:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml .Values.frontend.resources | nindent 12 }}
           {{- end }}
-          # Utilisation de tcpSocket pour éviter le problème du 404 au démarrage
           livenessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 10
-            periodSeconds: 10
+            initialDelaySeconds: 15 # Légèrement augmenté pour plus de sécurité
+            periodSeconds: 20
           readinessProbe:
             tcpSocket:
               port: http

@@ -24,7 +24,8 @@ kubectl create secret generic secrets-backend --from-env-file=secrets.env
 kubectl apply -f ./path/secrets.yaml
 ```
 
-Dans le second point, j'expose les données sensibles directement dans un fichier YAML (ce qui n'est pas une bonne pratique malheureurement). Malgré cela, j'utilise cette méthode pour créer les secrets car je n'arrive pas à connecter le secret à mon backend (le back et la bdd ne peuvent pas communiquer). 
+Dans le second point, j'expose les données sensibles directement dans un fichier YAML (ce qui n'est pas une bonne pratique malheureurement).
+Malgré cela, j'utilise cette méthode pour créer les secrets car je n'arrive pas à connecter le secret à mon backend avec l'autre méthode. 
 
 Une fois les secrets définis (quelque soit la démarque), j'ai ensuite modifié le fichier `backend.yaml` en remplaçant chaque 
 

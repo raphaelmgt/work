@@ -23,11 +23,11 @@ spec:
           imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: {{ .Values.backend.resources.requests.cpu }}
+              memory: {{ .Values.backend.resources.requests.memory }}
             limits:
-              cpu: 500m
-              memory: 256Mi
+              cpu: {{ .Values.backend.resources.limits.cpu }}
+              memory: {{ .Values.backend.resources.limits.memory }}
           env:
           - name: DB
             value: {{ .Values.postgresql.cluster.initdb.database | quote }}
@@ -53,9 +53,5 @@ spec:
           {{- end }}
           {{- with .Values.backend.readinessProbe }}
           readinessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.backend.resources }}
-          resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
