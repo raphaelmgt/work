@@ -8,7 +8,7 @@ spec:
   # Gestion du stockage (Persistance)
   storage:
     size: 10Gi
-    storageClass: standard # À adapter selon votre cloud (gp2, longhorn, etc.)
+    storageClass: standard
 
   # Configuration de la base de données
   bootstrap:
@@ -18,6 +18,5 @@ spec:
       secret:
         name: postgres-app-user-creds # Nom du secret contenant le mot de passe
 
-  # Monitoring (Optionnel)
   monitoring:
     enablePodMonitor: true

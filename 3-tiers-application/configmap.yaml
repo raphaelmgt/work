@@ -21,4 +21,4 @@ data:
     ('Alice', 'Le cours était clair et bien structuré.'),
     ('Bob', 'Les TP sont très compliqués je trouve.'),
     ('Charlie', 'Nul (oui je suis aigri mdr)'),
-    ('Diane', 'Le contenu est dense, mais les exemples aident beaucoup à comprendre.');
+    ('Diane', 'Le contenu est dense, mais les exemples aident beaucoup àla compréhension.');

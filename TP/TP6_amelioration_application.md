@@ -44,6 +44,18 @@ par
       key: DB_USER_SECRET
 ```
 
+## Mise en place d'un init container
+
+Pour remplir la base de données, j'ai défini un script sql dans le fichier `3-tiers-application/configmap.yaml`, qui sera exécuté lors de la création de la bdd.
+Une fois cela fait, il suffit de rajouter les lignes suivantes à la fin du fichier du deployment (ou du statefulset) de la bdd.
+
+```bash
+      volumes:
+        - name: sql-script-volume
+          configMap:
+            name: bdd-init
+```
+
 ## Mise en place d'une classe de Quality of Service (QoS) de type Guaranteed
 
 Afin de connaitre la QoS d'une pod donné, il suffit d'exécuter la commande suivante :
